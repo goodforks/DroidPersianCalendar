@@ -3,6 +3,9 @@ package com.byagowi.persiancalendar.entities
 import android.annotation.SuppressLint
 import android.content.Context
 import com.byagowi.persiancalendar.R
+import com.byagowi.persiancalendar.utils.ARABIC_INDIC_DIGITS
+import com.byagowi.persiancalendar.utils.DEVANAGARI_DIGITS
+import com.byagowi.persiancalendar.utils.PERSIAN_DIGITS
 import com.byagowi.persiancalendar.utils.listOf12Items
 import com.byagowi.persiancalendar.utils.listOf7Items
 import io.github.persiancalendar.praytimes.CalculationMethod
@@ -26,6 +29,7 @@ enum class Language(val code: String, val nativeName: String) {
     GLK("glk", "گيلکي"),
     JA("ja", "日本語"),
     KMR("kmr", "Kurdî"),
+    NE("ne", "Nepali"),
     TG("tg", "Тоҷикӣ"),
     TR("tr", "Türkçe"),
     UR("ur", "اردو");
@@ -85,25 +89,26 @@ enum class Language(val code: String, val nativeName: String) {
     // Whether locale uses الفبا or not
     val isArabicScript: Boolean
         get() = when (this) {
-            EN_US, JA, FR, ES, TR, KMR, EN_IR, TG -> false
+            EN_US, JA, FR, ES, TR, KMR, EN_IR, TG, NE -> false
             else -> true
         }
 
     // Whether locale would prefer local digits like ۱۲۳ over the global ones, 123, initially at least
     val prefersLocalDigits: Boolean
         get() = when (this) {
-            UR, EN_IR, EN_US, JA, FR, ES, TR, KMR, TG -> false
+            UR, EN_IR, EN_US, JA, FR, ES, TR, KMR, TG, NE -> false
             else -> true
         }
 
     // Local digits (۱۲۳) make sense for the locale
-    val canHaveLocalDigits get() = isArabicScript || isIranianEnglish
+    val canHaveLocalDigits get() = isArabicScript || isIranianEnglish || this == NE
 
     // Prefers ٤٥٦ over ۴۵۶
-    val prefersArabicIndicDigits: Boolean
+    val preferredDigits
         get() = when (this) {
-            AR, CKB -> true
-            else -> false
+            AR, CKB -> ARABIC_INDIC_DIGITS
+            NE -> DEVANAGARI_DIGITS
+            else -> PERSIAN_DIGITS
         }
 
     // We can presume user is from Afghanistan
@@ -176,6 +181,7 @@ enum class Language(val code: String, val nativeName: String) {
     fun getPersianMonths(context: Context): List<String> = when (this) {
         FA, EN_IR -> persianCalendarMonthsInPersian
         FA_AF -> persianCalendarMonthsInDari
+        NE -> nepaliMonths
         else -> persianCalendarMonths.map(context::getString)
     }
 
@@ -187,6 +193,7 @@ enum class Language(val code: String, val nativeName: String) {
     fun getGregorianMonths(context: Context, easternGregorianArabicMonths: Boolean) = when (this) {
         FA, EN_IR -> gregorianCalendarMonthsInPersian
         FA_AF -> gregorianCalendarMonthsInDari
+        NE -> nepaliMonths
         AR -> {
             if (easternGregorianArabicMonths) easternGregorianCalendarMonths
             else gregorianCalendarMonths.map(context::getString)
@@ -196,6 +203,7 @@ enum class Language(val code: String, val nativeName: String) {
 
     fun getWeekDays(context: Context): List<String> = when (this) {
         FA, EN_IR, FA_AF -> weekDaysInPersian
+        NE -> nepaliWeekDays
         else -> weekDays.map(context::getString)
     }
 

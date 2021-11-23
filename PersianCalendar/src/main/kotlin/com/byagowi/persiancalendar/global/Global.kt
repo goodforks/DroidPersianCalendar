@@ -213,12 +213,8 @@ fun updateStoredPreference(context: Context) {
     enableNewInterface = canEnableNewInterface &&
             prefs.getBoolean(PREF_NEW_INTERFACE, false) //shouldEnableNewInterface)
 
-    preferredDigits = when {
-        !prefs.getBoolean(PREF_PERSIAN_DIGITS, DEFAULT_PERSIAN_DIGITS) ||
-                !language.canHaveLocalDigits -> ARABIC_DIGITS
-        language.prefersArabicIndicDigits -> ARABIC_INDIC_DIGITS
-        else -> PERSIAN_DIGITS
-    }
+    preferredDigits = if (!prefs.getBoolean(PREF_PERSIAN_DIGITS, DEFAULT_PERSIAN_DIGITS) ||
+                !language.canHaveLocalDigits) ARABIC_DIGITS else language.preferredDigits
 
     clockIn24 = prefs.getBoolean(PREF_WIDGET_IN_24, DEFAULT_WIDGET_IN_24)
     isForcedIranTimeEnabled =
